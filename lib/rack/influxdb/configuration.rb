@@ -1,7 +1,7 @@
 module Rack
   class InfluxDB
     class Configuration
-      attr_accessor :name, :tags, :url, :token, :options
+      attr_accessor :name, :tags, :url, :token, :options, :write_options
 
       def initialize
         set_defaults
@@ -18,6 +18,10 @@ module Rack
           org: '',
           bucket: '',
           precision: InfluxDB2::WritePrecision::MILLISECOND
+        }
+        @write_options = {
+          write_type: InfluxDB2::WriteType::BATCHING,
+          batch_size: 100,
         }
       end
     end

@@ -32,7 +32,7 @@ module Rack
       return unless config.token
 
       InfluxDB2::Client.use(config.url, config.token, **config.options) do |c|
-        write_api = c.create_write_api
+        write_api = c.create_write_api(write_options: config.write_options)
         write_api.write(data: point(env, response))
       end
     end
