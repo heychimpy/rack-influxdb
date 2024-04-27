@@ -1,7 +1,8 @@
 module Rack
   class InfluxDB
     class Configuration
-      attr_accessor :name, :tags, :url, :token, :options, :write_options
+      attr_accessor :name, :tags, :url, :token, :options, :write_options,
+                    :fields
 
       def initialize
         set_defaults
@@ -14,6 +15,7 @@ module Rack
         @tags = {}
         @url = ''
         @token = ''
+        @fields = lambda { |env, response| return {} }
         @options = {
           org: '',
           bucket: '',

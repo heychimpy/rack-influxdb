@@ -41,14 +41,7 @@ module Rack
       {
         name: config.name,
         tags: config.tags,
-        fields: {
-          status: response[0],
-          bytes_out: bytes_out(response),
-          remote_addr: env['REMOTE_ADDR'],
-          user_agent: env['HTTP_USER_AGENT'],
-          method: env['REQUEST_METHOD'],
-          path: env['REQUEST_PATH']
-        }.compact
+        fields: config.fields.call(env, response)
       }
     end
 
