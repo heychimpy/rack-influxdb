@@ -21,10 +21,11 @@ module Rack
           bucket: '',
           precision: InfluxDB2::WritePrecision::MILLISECOND
         }
-        @write_options = {
+
+        @write_options = InfluxDB2::WriteOptions.new(
           write_type: InfluxDB2::WriteType::BATCHING,
           batch_size: 100,
-        }
+        )
       end
     end
   end
