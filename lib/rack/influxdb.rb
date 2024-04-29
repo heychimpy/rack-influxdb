@@ -35,6 +35,9 @@ module Rack
         write_api = c.create_write_api(write_options: config.write_options)
         write_api.write(data: point(env, response))
       end
+    rescue => e
+      # Let the app decide what needs to be done when an error occurs.
+      config.handle_error.call(e)
     end
 
     def point(env, response)
@@ -47,10 +50,6 @@ module Rack
 
     def config
       Rack::InfluxDB.configuration
-    end
-
-    def bytes_out(response)
-      response[2].reduce(0) { |sum, str| sum += (str&.bytesize || 0) }
     end
   end
 end
