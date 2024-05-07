@@ -17,6 +17,7 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  x86_64-linux
 
 DEPENDENCIES
   bundler (>= 1.17, < 3.0)
