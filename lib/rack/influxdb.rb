@@ -29,7 +29,7 @@ module Rack
       # The presence or absence of a token implicitly determines whether it
       # should be executed at all. This allows this gem to run in each
       # environment.
-      return unless config.token
+      return if config.token.to_s.empty?
 
       InfluxDB2::Client.use(config.url, config.token, **config.options) do |c|
         write_api = c.create_write_api(write_options: config.write_options)

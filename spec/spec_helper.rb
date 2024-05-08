@@ -4,6 +4,7 @@ require 'rack'
 require 'rack/test'
 require 'rack/influxdb'
 
+# The dummy app which includes the Rack::InfluxDB middleware.
 def app
   Rack::Builder.new do
     # Include the InfluxDB middleware.
@@ -14,6 +15,8 @@ def app
 end
 
 RSpec.configure do |config|
+  config.include Rack::Test::Methods
+
   config.expect_with :rspec do |conf|
     conf.syntax = :expect
   end
