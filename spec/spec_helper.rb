@@ -1,13 +1,20 @@
 require 'bundler/setup'
 
-require 'minitest/autorun'
+require 'rack'
 require 'rack/test'
 require 'rack/influxdb'
 
-class Minitest::Spec
-  include Rack::Test::Methods
+def app
+  Rack::Builder.new do
+    # Include the InfluxDB middleware.
+    use Rack::InfluxDB
 
-  def app
-    ->(env) { [200, {}, ['Hello World']] }
+    run lambda { |_env| [200, {}, ['Hello World']] }
+  end.to_app
+end
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |conf|
+    conf.syntax = :expect
   end
 end
