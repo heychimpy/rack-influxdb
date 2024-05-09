@@ -32,6 +32,10 @@ RSpec.describe Rack::InfluxDB do
   end
 
   describe '#call' do
+    before do
+      allow(Thread).to receive(:new).and_yield
+    end
+
     it 'returns the initial status code' do
       get '/'
 
@@ -76,7 +80,6 @@ RSpec.describe Rack::InfluxDB do
     context 'when an error occurs' do
       before do
         allow(InfluxDB2::Client).to receive(:use).and_raise('Could not write')
-        allow(Thread).to receive(:new).and_yield
 
         described_class.configure do |config|
           config.token = "token"
