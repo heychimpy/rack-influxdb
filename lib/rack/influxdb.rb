@@ -31,9 +31,17 @@ module Rack
       # environment.
       return if config.token.to_s.empty?
 
-      InfluxDB2::Client.use(config.url, config.token, **config.options) do |c|
-        write_api = c.create_write_api(write_options: config.write_options)
-        write_api.write(data: point(env, response))
+      # Run the write logic inside a thread so we don't slow down
+      # main request.
+      Thread.new do
+        begin
+          InfluxDB2::Client.use(config.url, config.token, **config.options) do |c|
+            write_api = c.create_write_api(write_options: config.write_options)
+            write_api.write(data: point(env, response))
+          end
+        rescue => e
+          config.handle_error.call(e)
+        end
       end
     rescue => e
       # Let the app decide what needs to be done when an error occurs.
