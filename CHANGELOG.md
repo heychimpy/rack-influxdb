@@ -1,37 +1,18 @@
- Changelog
+# Changelog
 
-## [0.1.0]
+## [0.1.1] 
 ### Added
-- Added minimal test
-- Created `.github/workflows/test.yml`
-- Added linux x86_64
+- Added a code of conduct.
+- Added a changelog.
 
-### Changed
-- Bumped to 0.1.0
-
-## [0.0.5] 
-### Changed
-- Improved specs
-- Moved writing to separate thread
-
-## [0.0.4] 
-### Changed
-- Improved README.md
-- Improved specs
-- Switched to RSpec instead of minitest
-
-## [0.0.3] 
-### Removed
-- Removed Ruby 2.6 support
-
-### Added
-- Added path
-- Added configuration
-
-## [0.0.2] 
-### Fixed
-- Error handling
-
-## [0.0.1] 
-### Added
-- Initial commit
+## [0.1.0] - Initial Commits
+- Added initial configuration and path settings.
+- Added error handling and write options.
+- Added `.github/workflows/test.yml` for continuous integration.
+- Improved specs for the project.
+- Moved writing to a separate thread.
+- Switched to RSpec from Minitest.
+- Improved `README.md`.
+- Removed support for Ruby 2.6.
+- Added support for Linux `x86_64` architecture.
+- Added minimal tests.
