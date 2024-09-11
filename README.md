@@ -1,6 +1,9 @@
 # rack-influxdb
 
 [![Continuous Integration](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 
 This gem provides a Rack middleware for [InfluxDB](https://github.com/influxdata/influxdb).
 
