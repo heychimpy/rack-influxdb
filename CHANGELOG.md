@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.1] 
+## [0.1.1]
 ### Added
 - Added a code of conduct.
 - Added a changelog.
