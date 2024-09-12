@@ -1,0 +1,9 @@
+# .rubocop.yml
+AllCops:
+  TargetRubyVersion: 3.1
+
+Metrics/LineLength:
+  Max: 120
+
+Layout/IndentationWidth:
+  Width: 2

@@ -1,0 +1,32 @@
+name: Linters
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cache Ruby gems
+        uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v2
+        with:
+          ruby-version: '3.1'
+
+      - name: Install Dependencies
+        run: bundle install --jobs 4 --retry 3
+
+      - name: RuboCop Linter
+        run: bundle exec rubocop
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
