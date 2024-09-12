@@ -1,36 +1,40 @@
-name: Run Reek with reviewdog
+name: CI
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    push:
+      branches: [ "master" ]
+    pull_request:
+      branches: [ "master" ]
 
 jobs:
-  reek_lint:
+  test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        ruby-version: ['2.7', '3.0', '3.2'] 
+        ruby-version: [2.7, 3.0, 3.2]
 
     steps:
-      - name: Check out the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby-version }} 
+          ruby-version: ${{ matrix.ruby-version }}
+
+      - name: Cache Bundler gems
+        uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-bundler-${{ matrix.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundler-${{ matrix.ruby-version }}-
 
       - name: Install dependencies
-        run: bundle install 
+        run: |
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
 
-      - name: Run Reek and report to reviewdog
-        uses: reviewdog/action-reek@v1
-        with:
-          tool_name: reek
-          level: warning
-          reporter: github-pr-review  # This will leave comments on the pull request
-          fail_on_error: false        # Don't block merging on Reek warnings
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        run: bundle exec rspec
