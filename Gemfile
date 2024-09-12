@@ -9,6 +9,4 @@ group :development, :test do
 end
 
 gem 'reek', require: false
-gem 'dry-core', '~> 0.7.0' # Specify the compatible version of dry-core
-
-
+gem 'dry-core', '~> 0.7.0'
