@@ -94,6 +94,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (>= 1.17, < 3.0)
+  dry-core (~> 1.0.0)
   rack-influxdb!
   rack-test (~> 2.0)
   rake (~> 13.0)
