@@ -3,3 +3,9 @@
 source 'https://rubygems.org'
 
 gemspec
+
+# Gemfile
+group :development, :test do
+    gem 'rubocop', '~> 1.0'
+end
+  
