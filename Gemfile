@@ -6,6 +6,7 @@ gemspec
 
 # Gemfile
 group :development, :test do
-    gem 'rubocop', '~> 1.0'
+  gem 'rubocop', '~> 1.0'
 end
-  
+
+gem 'reek', require: false
