@@ -1,5 +1,8 @@
 # .rubocop.yml
 
+require:
+  - rubocop-performance
+
 AllCops:
   Exclude:
     - 'Gemfile'
