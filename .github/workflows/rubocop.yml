@@ -9,23 +9,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.0', '3.2']  # Add more versions as needed
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Cache Ruby gems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
       - name: Install Ruby
-        uses: ruby/setup-ruby@v2
+        uses: ruby/setup-ruby@v1  # Stable version
         with:
-          ruby-version: '3.1'
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true  # Handles caching of gems automatically
 
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3
