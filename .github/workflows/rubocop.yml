@@ -7,12 +7,11 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  rubocop:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.0', '3.2']  
-
+        ruby-version: ['3.0', '3.2']
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -21,12 +20,19 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true  # Automatically handles gem caching
+          bundler-cache: true
+
+      - name: Cache Bundler dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-bundler-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-bundler-
 
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3
 
       - name: Run RuboCop Linter
-        run: bundle exec rubocop
+        run: bundle exec rubocop --parallel
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
