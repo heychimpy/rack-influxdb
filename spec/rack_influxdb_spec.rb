@@ -1,4 +1,6 @@
-require_relative './spec_helper'
+# frozen_string_literal: true
+
+require_relative 'spec_helper'
 
 RSpec.describe Rack::InfluxDB do
   describe '.configuration' do
@@ -61,8 +63,8 @@ RSpec.describe Rack::InfluxDB do
         allow(InfluxDB2::Client).to receive(:use)
 
         described_class.configure do |config|
-          config.token = "token"
-          config.url = "example.com"
+          config.token = 'token'
+          config.url = 'example.com'
         end
       end
 
@@ -82,8 +84,8 @@ RSpec.describe Rack::InfluxDB do
         allow(InfluxDB2::Client).to receive(:use).and_raise('Could not write')
 
         described_class.configure do |config|
-          config.token = "token"
-          config.url = "example.com"
+          config.token = 'token'
+          config.url = 'example.com'
         end
       end
 

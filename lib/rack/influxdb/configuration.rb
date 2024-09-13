@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rack
   class InfluxDB
     class Configuration
@@ -15,8 +17,8 @@ module Rack
         @tags = {}
         @url = ''
         @token = ''
-        @fields = lambda { |env, response| return {} }
-        @handle_error = lambda { |err| return }
+        @fields = ->(_env, _response) { {} }
+        @handle_error = ->(_err) {}
         @options = {
           org: '',
           bucket: '',
@@ -25,7 +27,7 @@ module Rack
 
         @write_options = InfluxDB2::WriteOptions.new(
           write_type: InfluxDB2::WriteType::BATCHING,
-          batch_size: 100,
+          batch_size: 100
         )
       end
     end
