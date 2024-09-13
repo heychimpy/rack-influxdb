@@ -9,28 +9,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.0', '3.2']  
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Cache Ruby gems
-        uses: actions/cache@v3
+      - name: Set Up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Ruby
-        uses: ruby/setup-ruby@v2
-        with:
-          ruby-version: '3.1'
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true  # Automatically handles gem caching
 
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3
 
-      - name: RuboCop Linter
+      - name: Run RuboCop Linter
         run: bundle exec rubocop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
