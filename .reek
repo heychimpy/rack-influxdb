@@ -1,0 +1,5 @@
+# .reek
+---
+smell_detectors:
+  UnusedParameters:
+    enabled: true
