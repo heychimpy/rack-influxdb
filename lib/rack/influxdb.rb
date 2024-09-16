@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 require 'influxdb-client'
 require 'rack/influxdb/configuration'
 
 module Rack
+  # The InfluxDB rack middleware class.
   class InfluxDB
     class << self
-      attr_reader :configuration
-
       def configuration
         @configuration ||= Rack::InfluxDB::Configuration.new
       end
@@ -34,16 +35,11 @@ module Rack
       # Run the write logic inside a thread so we don't slow down
       # main request.
       Thread.new do
-        begin
-          InfluxDB2::Client.use(config.url, config.token, **config.options) do |c|
-            write_api = c.create_write_api(write_options: config.write_options)
-            write_api.write(data: point(env, response))
-          end
-        rescue => e
-          config.handle_error.call(e)
-        end
+        write(env, response)
+      rescue StandardError => e
+        config.handle_error.call(e)
       end
-    rescue => e
+    rescue StandardError => e
       # Let the app decide what needs to be done when an error occurs.
       config.handle_error.call(e)
     end
@@ -54,6 +50,18 @@ module Rack
         tags: config.tags,
         fields: config.fields.call(env, response)
       }
+    end
+
+    def write(env, response)
+      client do |c|
+        write_api = c.create_write_api(write_options: config.write_options)
+        write_api.write(data: point(env, response))
+      end
+    end
+
+    def client
+      @client ||= InfluxDB2::Client.use \
+        config.url, config.token, **config.options
     end
 
     def config

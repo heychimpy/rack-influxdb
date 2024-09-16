@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Rack
   class InfluxDB
+    # The main configuration for the gem.
     class Configuration
       attr_accessor :name, :tags, :url, :token, :options, :write_options,
                     :fields, :handle_error
@@ -15,17 +18,24 @@ module Rack
         @tags = {}
         @url = ''
         @token = ''
-        @fields = lambda { |env, response| return {} }
-        @handle_error = lambda { |err| return }
-        @options = {
+        @fields = ->(_env, _response) { {} }
+        @handle_error = ->(_err) { nil }
+        @options = default_options
+        @write_options = default_write_options
+      end
+
+      def default_options
+        {
           org: '',
           bucket: '',
           precision: InfluxDB2::WritePrecision::MILLISECOND
         }
+      end
 
-        @write_options = InfluxDB2::WriteOptions.new(
+      def default_write_options
+        InfluxDB2::WriteOptions.new(
           write_type: InfluxDB2::WriteType::BATCHING,
-          batch_size: 100,
+          batch_size: 100
         )
       end
     end
