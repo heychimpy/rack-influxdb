@@ -9,6 +9,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    brakeman (6.2.1)
+      racc
     diff-lcs (1.5.1)
     influxdb-client (3.1.0)
     json (2.7.2)
@@ -64,11 +66,12 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  brakeman (~> 6.2)
   bundler (>= 1.17, < 3.0)
   rack-influxdb!
   rack-test (~> 2.0)
   rake (~> 13.0)
-  reek (= 6.1.4)
+  reek (~> 6.1)
   rspec (~> 3.13)
   rubocop (~> 1.0)
 
