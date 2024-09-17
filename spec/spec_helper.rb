@@ -1,7 +1,9 @@
+# spec/spec_helper.rb
 # frozen_string_literal: true
 
-require 'bundler/setup'
+require_relative 'simplecov_helper' # Include SimpleCov configuration
 
+require 'bundler/setup'
 require 'rack'
 require 'rack/test'
 require 'rack/influxdb'

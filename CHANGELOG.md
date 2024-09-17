@@ -6,6 +6,7 @@
 - Added a changelog.
 - Added Rubocop check.
 - Added Reek check.
+- Added test coverage.
 
 ## [0.1.0] - Initial Commits
 - Added initial configuration and path settings.

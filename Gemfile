@@ -8,4 +8,5 @@ gemspec
 group :development, :test do
   gem 'reek', '6.1.4'
   gem 'rubocop', '~> 1.0'
+  gem 'simplecov'
 end
