@@ -7,8 +7,11 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.0', '3.2']
 
     steps:
       - name: Checkout Code
@@ -23,9 +26,9 @@ jobs:
             ${{ runner.os }}-gems-
 
       - name: Install Ruby
-        uses: ruby/setup-ruby@v2
+        uses: ruby/setup-ruby@v1 # Use the latest version
         with:
-          ruby-version: '3.1'
+          ruby-version: ${{ matrix.ruby-version }}
 
       - name: Install Dependencies
         run: bundle install --jobs 4 --retry 3

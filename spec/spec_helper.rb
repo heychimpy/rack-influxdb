@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 
 require 'rack'
@@ -10,7 +12,7 @@ def app
     # Include the InfluxDB middleware.
     use Rack::InfluxDB
 
-    run lambda { |_env| [200, {}, ['Hello World']] }
+    run ->(_env) { [200, {}, ['Hello World']] }
   end.to_app
 end
 
