@@ -4,6 +4,7 @@
 ### Added
 - Added a code of conduct.
 - Added a changelog.
+- Added Rubocop check
 
 ## [0.1.0] - Initial Commits
 - Added initial configuration and path settings.
