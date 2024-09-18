@@ -1,4 +1,5 @@
 # rack-influxdb
+![Github Chimpy](https://github.com/user-attachments/assets/c21e62b7-d1c8-43db-b2d1-15f00abd07c7)
 
 [![Continuous Integration](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
