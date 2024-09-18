@@ -2,6 +2,9 @@
 
 [![Continuous Integration](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop/rubocop)
+![Reek Badge](https://img.shields.io/badge/code%20quality-reek-brightgreen?style=flat-square)
+![Brakeman Badge](https://img.shields.io/badge/security-brakeman-brightgreen?style=flat-square)
 
 This gem provides a Rack middleware for [InfluxDB](https://github.com/influxdata/influxdb).
 
