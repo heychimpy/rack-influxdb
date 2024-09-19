@@ -1,6 +1,8 @@
 # rack-influxdb
+![Github Chimpy](https://github.com/user-attachments/assets/4f7c612e-2de7-45b4-bee7-dd54ab3e1d51)
 
 [![Continuous Integration](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/heychimpy/rack-influxdb/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/heychimpy/rack-influxdb/graph/badge.svg?token=L9NVAKCQWU)](https://codecov.io/gh/heychimpy/rack-influxdb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop/rubocop)
 ![Reek Badge](https://img.shields.io/badge/code%20quality-reek-brightgreen?style=flat-square)
