@@ -59,8 +59,14 @@ RSpec.describe Rack::InfluxDB do
     end
 
     context 'when config token is given' do
+      let(:conf) { described_class.configuration }
+      let(:influx_client) { double('InfluxDB2::Client') }
+      let(:write_api) { double('InfluxDB2::WriteApi') }
+
       before do
-        allow(InfluxDB2::Client).to receive(:use)
+        allow(InfluxDB2::Client).to receive(:use).and_return(influx_client)
+        allow(influx_client).to receive(:create_write_api).and_return(write_api)
+        allow(write_api).to receive(:write)
 
         described_class.configure do |config|
           config.token = 'token'
@@ -68,14 +74,27 @@ RSpec.describe Rack::InfluxDB do
         end
       end
 
-      let(:conf) { described_class.configuration }
-
       it 'calls InfluxDB2::Client.use with right params' do
         get '/'
 
         expect(InfluxDB2::Client)
           .to have_received(:use)
           .with(conf.url, conf.token, conf.options)
+      end
+
+      it 'writes a data point to InfluxDB' do
+        get '/'
+
+        expect(write_api).to have_received(:write)
+          .with(data: hash_including(name: conf.name))
+      end
+
+      it 'reuses the same write API instead of creating a new one per request' do
+        middleware = described_class.new(->(_env) { [200, {}, ['Hello World']] })
+
+        2.times { middleware.call(Rack::MockRequest.env_for('/')) }
+
+        expect(influx_client).to have_received(:create_write_api).once
       end
     end
 

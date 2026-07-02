@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.3]
+### Fixed
+- Fixed a race condition where concurrent requests during the first write
+  could each lazily create their own InfluxDB client and `WriteApi`
+  (each spinning up its own background batch processor); the client and
+  write API are now only ever initialized once, under a mutex.
+
+## [0.1.2]
+### Fixed
+- Fixed a regression from 0.1.1 where request data was never actually
+  written to InfluxDB: the write logic was passed as a block to a method
+  that never yielded, so it silently never ran.
+- Stopped creating a new `WriteApi` (and its background batch processor)
+  on every request; the write API client is now created once and reused.
+
 ## [0.1.1]
 ### Added
 - Added a code of conduct.

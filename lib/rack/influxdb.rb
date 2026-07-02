@@ -18,6 +18,7 @@ module Rack
 
     def initialize(app)
       @app = app
+      @write_api_mutex = Mutex.new
     end
 
     def call(env)
@@ -53,9 +54,14 @@ module Rack
     end
 
     def write(env, response)
-      client do |c|
-        write_api = c.create_write_api(write_options: config.write_options)
-        write_api.write(data: point(env, response))
+      write_api.write(data: point(env, response))
+    end
+
+    def write_api
+      return @write_api if @write_api
+
+      @write_api_mutex.synchronize do
+        @write_api ||= client.create_write_api(write_options: config.write_options)
       end
     end
 
