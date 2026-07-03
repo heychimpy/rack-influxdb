@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative './spec_helper'
+require 'weakref'
 
 RSpec.describe Rack::InfluxDB do
   describe '.configuration' do
@@ -34,10 +35,6 @@ RSpec.describe Rack::InfluxDB do
   end
 
   describe '#call' do
-    before do
-      allow(Thread).to receive(:new).and_yield
-    end
-
     it 'returns the initial status code' do
       get '/'
 
@@ -51,8 +48,8 @@ RSpec.describe Rack::InfluxDB do
     end
 
     context 'when no config token is given' do
-      it 'does not call InfluxDB2::Client.use' do
-        expect(InfluxDB2::Client).not_to receive(:use)
+      it 'does not call InfluxDB2::Client.new' do
+        expect(InfluxDB2::Client).not_to receive(:new)
 
         get '/'
       end
@@ -62,11 +59,15 @@ RSpec.describe Rack::InfluxDB do
       let(:conf) { described_class.configuration }
       let(:influx_client) { double('InfluxDB2::Client') }
       let(:write_api) { double('InfluxDB2::WriteApi') }
+      let(:write_calls) { [] }
+      let(:write_mutex) { Mutex.new }
 
       before do
-        allow(InfluxDB2::Client).to receive(:use).and_return(influx_client)
+        allow(InfluxDB2::Client).to receive(:new).and_return(influx_client)
         allow(influx_client).to receive(:create_write_api).and_return(write_api)
-        allow(write_api).to receive(:write)
+        allow(write_api).to receive(:write) do |data:|
+          write_mutex.synchronize { write_calls << data }
+        end
 
         described_class.configure do |config|
           config.token = 'token'
@@ -74,19 +75,22 @@ RSpec.describe Rack::InfluxDB do
         end
       end
 
-      it 'calls InfluxDB2::Client.use with right params' do
+      it 'calls InfluxDB2::Client.new with right params' do
         get '/'
 
+        wait_for { write_calls.any? }
+
         expect(InfluxDB2::Client)
-          .to have_received(:use)
+          .to have_received(:new)
           .with(conf.url, conf.token, conf.options)
       end
 
       it 'writes a data point to InfluxDB' do
         get '/'
 
-        expect(write_api).to have_received(:write)
-          .with(data: hash_including(name: conf.name))
+        wait_for { write_calls.any? }
+
+        expect(write_calls).to include(hash_including(name: conf.name))
       end
 
       it 'reuses the same write API instead of creating a new one per request' do
@@ -94,13 +98,67 @@ RSpec.describe Rack::InfluxDB do
 
         2.times { middleware.call(Rack::MockRequest.env_for('/')) }
 
+        wait_for { write_calls.size >= 2 }
+
         expect(influx_client).to have_received(:create_write_api).once
+      end
+
+      it 'returns the response without waiting for the write to InfluxDB' do
+        allow(write_api).to receive(:write) do |data:|
+          sleep 0.3
+          write_mutex.synchronize { write_calls << data }
+        end
+
+        middleware = described_class.new(->(_env) { [200, {}, ['Hello World']] })
+
+        started_at = Time.now
+        middleware.call(Rack::MockRequest.env_for('/'))
+        elapsed = Time.now - started_at
+
+        expect(elapsed).to be < 0.1
+      end
+
+      it 'creates exactly one worker thread no matter how many requests come in' do
+        thread_count = 0
+        thread_count_mutex = Mutex.new
+        allow(Thread).to receive(:new).and_wrap_original do |original, *args, &block|
+          thread_count_mutex.synchronize { thread_count += 1 }
+          original.call(*args, &block)
+        end
+
+        middleware = described_class.new(->(_env) { [200, {}, ['Hello World']] })
+        5.times { middleware.call(Rack::MockRequest.env_for('/')) }
+
+        wait_for { write_calls.size >= 5 }
+
+        expect(thread_count).to eq(1)
+      end
+
+      it 'does not retain the Rack env after the worker has processed it' do
+        middleware = described_class.new(->(_env) { [200, {}, ['Hello World']] })
+
+        # Building the env and the WeakRef inside a lambda, rather than in
+        # local variables of the example itself, lets `env` fall out of
+        # scope (and become eligible for GC) as soon as the lambda returns.
+        weak_env = lambda do
+          env = Rack::MockRequest.env_for('/')
+          ref = WeakRef.new(env)
+          middleware.call(env)
+          ref
+        end.call
+
+        wait_for { write_calls.any? }
+        GC.start
+
+        # `weakref_alive?` is falsy (nil or false, depending on Ruby version)
+        # once the referenced object has been collected.
+        expect(weak_env.weakref_alive?).to be_falsey
       end
     end
 
     context 'when an error occurs' do
       before do
-        allow(InfluxDB2::Client).to receive(:use).and_raise('Could not write')
+        allow(InfluxDB2::Client).to receive(:new).and_raise('Could not write')
 
         described_class.configure do |config|
           config.token = 'token'
@@ -119,14 +177,21 @@ RSpec.describe Rack::InfluxDB do
       end
 
       context 'when custom error handling is applied' do
-        before do
-          described_class.configure do |config|
-            config.handle_error = ->(e) { raise e }
-          end
-        end
+        it 'passes the raised error to the custom error handler' do
+          handled_errors = []
+          handled_mutex = Mutex.new
 
-        it 'it gets handled (re-raised)' do
-          expect { get '/' }.to raise_error('Could not write')
+          described_class.configure do |config|
+            config.handle_error = lambda do |e|
+              handled_mutex.synchronize { handled_errors << e }
+            end
+          end
+
+          get '/'
+
+          wait_for { handled_errors.any? }
+
+          expect(handled_errors.first.message).to eq('Could not write')
         end
       end
     end
