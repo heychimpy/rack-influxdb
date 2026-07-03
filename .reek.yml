@@ -19,6 +19,7 @@ detectors:
     - Rack::InfluxDB#write_request
   TooManyInstanceVariables:
     exclude:
+    - Rack::InfluxDB
     - Rack::InfluxDB::Configuration
   TooManyStatements:
     exclude:
@@ -27,7 +28,7 @@ detectors:
     - Rack::InfluxDB#write_request
   UncommunicativeVariableName:
     exclude:
-    - Rack::InfluxDB#write
+    - Rack::InfluxDB#process_queue
     - Rack::InfluxDB#write_request
   UtilityFunction:
     exclude:
