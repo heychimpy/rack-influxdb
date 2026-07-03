@@ -1,8 +1,9 @@
 # .rubocop.yml
 AllCops:
   TargetRubyVersion: 3.0
+  NewCops: disable
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/BlockLength:

@@ -136,16 +136,23 @@ RSpec.describe Rack::InfluxDB do
 
       it 'does not retain the Rack env after the worker has processed it' do
         middleware = described_class.new(->(_env) { [200, {}, ['Hello World']] })
-        env = Rack::MockRequest.env_for('/')
-        weak_env = WeakRef.new(env)
 
-        middleware.call(env)
+        # Building the env and the WeakRef inside a lambda, rather than in
+        # local variables of the example itself, lets `env` fall out of
+        # scope (and become eligible for GC) as soon as the lambda returns.
+        weak_env = lambda do
+          env = Rack::MockRequest.env_for('/')
+          ref = WeakRef.new(env)
+          middleware.call(env)
+          ref
+        end.call
+
         wait_for { write_calls.any? }
-
-        env = nil
         GC.start
 
-        expect(weak_env.weakref_alive?).to be(false)
+        # `weakref_alive?` is falsy (nil or false, depending on Ruby version)
+        # once the referenced object has been collected.
+        expect(weak_env.weakref_alive?).to be_falsey
       end
     end
 
