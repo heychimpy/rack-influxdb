@@ -19,11 +19,14 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 3.0'
 
-  # influxdb-client requires 'csv', which Ruby no longer bundles by default
-  # as of 3.4; declare it explicitly so consumers on newer Rubies don't hit
-  # a LoadError.
+  # influxdb-client requires 'csv', 'base64' and 'logger', which Ruby no
+  # longer bundles by default as of 3.4 (csv, base64) and 4.0 (logger);
+  # declare them explicitly so consumers on newer Rubies don't hit a
+  # LoadError.
+  s.add_runtime_dependency 'base64'
   s.add_runtime_dependency 'csv'
   s.add_runtime_dependency 'influxdb-client', '>= 3'
+  s.add_runtime_dependency 'logger'
   s.add_runtime_dependency 'rack', '>= 1.0', '< 4'
 
   s.add_development_dependency 'bundler', '>= 1.17', '< 3.0'
